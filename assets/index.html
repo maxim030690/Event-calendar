@@ -1,9 +1,22 @@
-<?php
-
-function calendar( $atts ){
-?>
-<div id="calendar"></div>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="fullcalendar.css">
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6"><div id="calendar"></div></div>
+		</div>
+	</div>
+</body>
+<script src='lib/jquery.min.js'></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src='lib/moment.min.js'></script>
+<script src='fullcalendar.js'></script>
 <script>
 	(function calendar_m (){
     var calendar_b = $('#calendar');
@@ -74,21 +87,4 @@ function calendar( $atts ){
       })
   }());
 </script>
-
-<?php
-}
-
-
-add_shortcode('display_calendar', 'calendar');
-
-add_action( 'wp_enqueue_scripts', 'my_scripts_for_events' );
-
-function my_scripts_for_events(){
-	$all_options = get_option('true_options');
-	wp_enqueue_style( 'eventstyles', MAX_CALENDAR_URL.'assets/fullcalendar.css' );
-	wp_deregister_script( 'jquery' );
-	wp_register_script( 'jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js');
-	wp_enqueue_script( 'jquery' );
-	wp_enqueue_script( 'moment', MAX_CALENDAR_URL . 'assets/lib/moment.min.js');
-	wp_enqueue_script( 'fullcalendar', MAX_CALENDAR_URL . 'assets/fullcalendar.js');
-}
+</html>
