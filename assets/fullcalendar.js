@@ -14467,7 +14467,7 @@ var DayGridEventRenderer = /** @class */ (function (_super) {
             '<span class="fc-title">' +
                 (util_1.htmlEscape(eventDef.title || '') || '&nbsp;') + // we always want one line of height
                 '</span>';
-        return '<a class="' + classes.join(' ') + '"' +
+        return '<a data-toggle="modal" data-target="#myModal" class="' + classes.join(' ') + '"' +
             (eventDef.url ?
                 ' href="' + util_1.htmlEscape(eventDef.url) + '"' :
                 '') +

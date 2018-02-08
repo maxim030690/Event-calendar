@@ -34,7 +34,7 @@ function create_post_type_markers() { // создаем новый тип зап
 	'show_in_menu'  => 'max_events_plugin_settings',
 	// 'show_ui'  => false,
 	'rewrite' => array('slug' => 'markers'), // указываем slug для ссылок например: mysite/reviews/
-	'supports' => array('title')
+	'supports' => array('title', 'thumbnail', 'editor')
 	) 
 	); 
 }
@@ -43,7 +43,7 @@ function create_post_type_markers() { // создаем новый тип зап
 function myplugin_add_custom_box() {
 	$screens = array( 'calendar');
 	foreach ( $screens as $screen )
-		add_meta_box( 'myplugin_sectionid', 'Date', 'myplugin_meta_box_callback', $screen );
+		add_meta_box( 'myplugin_sectionid', 'Date and link event', 'myplugin_meta_box_callback', $screen );
 }
 add_action('add_meta_boxes', 'myplugin_add_custom_box');
 
@@ -51,11 +51,15 @@ add_action('add_meta_boxes', 'myplugin_add_custom_box');
 function myplugin_meta_box_callback() {
 	$post_id = get_the_ID();
 	$date = get_post_meta( $post_id, 'date', true );
+	$link = get_post_meta( $post_id, 'link-event', true );
+
 	// Используем nonce для верификации
 	wp_nonce_field( plugin_basename(__FILE__), 'max_event_plugin' );
 
 
 	echo '<input type="text" id="datepicker" placeholder="Date" value="'.$date.'" name="date">';
+
+	echo '<input type="text" id="link-event" placeholder="Link event" value="'.$link.'" name="link-event">';
 
 	echo '<script>
 		    jQuery(document).ready(function($) {
@@ -89,136 +93,15 @@ function myplugin_save_postdata( $post_id ) {
 	// Все ОК. Теперь, нужно найти и сохранить данные
 	// Очищаем значение поля input.
 	$date = $_POST['date'] ;
+	$link = $_POST['link-event'] ;
 	// Обновляем данные в базе данных.
 	update_post_meta( $post_id, 'date', $date );
+	update_post_meta( $post_id, 'link-event', $link );
 }
 add_action( 'save_post', 'myplugin_save_postdata' );
 
 function add_my_setting(){
-	$true_page = 'max_events_plugin_settings';
-	?>
-	<div class="wrap">
-		<form action="options.php" method="POST">
-			<?php 
-			settings_fields('max_event_options');
-			do_settings_sections($true_page);?>
-			<?php submit_button();
-			?>	
-		</form>
-		<?php echo '<h3>Shortcode: [display_calendar]</h3>'; ?>
-	</div>
-	<?php
-
-}
-
-function true_option_settings() {
-	$true_page = 'max_events_plugin_settings';
-	
-	register_setting( 'max_event_options', 'true_options', 'true_validate_settings' ); 
- 
-	
-	add_settings_section( 'true_section_1', 'Settings map', '', $true_page );
- 
-	$true_field_params = array(
-		'type'      => 'text', 
-		'id'        => 'api_key',
-		'desc'      => 'Enter your api key'
-	);
-	add_settings_field( 'api_key_field', 'Api key', 'true_option_display_settings', $true_page, 'true_section_1', $true_field_params );
-
-	$true_field_params = array(
-		'type'      => 'text', 
-		'id'        => 'width',
-		'desc'      => 'width map'
-	);
-	add_settings_field( 'width_map_field', 'Width map in %', 'true_option_display_settings', $true_page, 'true_section_1', $true_field_params );
-
-	$true_field_params = array(
-		'type'      => 'text', 
-		'id'        => 'height',
-		'desc'      => 'height map'
-	);
-	add_settings_field( 'height_map_field', 'Height map in px', 'true_option_display_settings', $true_page, 'true_section_1', $true_field_params );
-	$true_field_params = array(
-		'type'      => 'text', 
-		'id'        => 'zoom',
-		'desc'      => 'example: 6 or 8 or 10'
-	);
-	add_settings_field( 'zoom_map_field', 'Zoom map', 'true_option_display_settings', $true_page, 'true_section_1', $true_field_params );
-	$true_field_params = array(
-		'type'      => 'text', 
-		'id'        => 'longtitude',
-		'desc'      => 'longtitude'
-	);
-	add_settings_field( 'longtitude_map_field', 'longtitude map', 'true_option_display_settings', $true_page, 'true_section_1', $true_field_params );
-	$true_field_params = array(
-		'type'      => 'text', 
-		'id'        => 'latitude',
-		'desc'      => 'latitude'
-	);
-	add_settings_field( 'latitude_map_field', 'latitude map', 'true_option_display_settings', $true_page, 'true_section_1', $true_field_params );
-
-	$true_field_params = array(
-		'type'      => 'text', 
-		'id'        => 'display_markers',
-		'desc'      => 'Choose 1 if display'
-	);
-	add_settings_field( 'display_map_field', 'display markers', 'true_option_display_settings', $true_page, 'true_section_1', $true_field_params );
-
-}
-add_action( 'admin_init', 'true_option_settings' );
-
-function true_option_display_settings($args) {
-	extract( $args );
- 
-	$option_name = 'true_options';
- 
-	$o = get_option( $option_name );
- 
-	switch ( $type ) {  
-		case 'text':  
-			$o[$id] = esc_attr( stripslashes($o[$id]) );
-			echo "<input class='regular-text' type='text' id='$id' name='" . $option_name . "[$id]' value='$o[$id]' />";  
-			echo ($desc != '') ? "<br /><span class='description'>$desc</span>" : "";  
-		break;
-		case 'textarea':  
-			$o[$id] = esc_attr( stripslashes($o[$id]) );
-			echo "<textarea class='code large-text' cols='50' rows='10' type='text' id='$id' name='" . $option_name . "[$id]'>$o[$id]</textarea>";  
-			echo ($desc != '') ? "<br /><span class='description'>$desc</span>" : "";  
-		break;
-		case 'checkbox':
-			$checked = ($o[$id] == 'on') ? " checked='checked'" :  '';  
-			echo "<label><input type='checkbox' id='$id' name='" . $option_name . "[$id]' $checked /> ";  
-			echo ($desc != '') ? $desc : "";
-			echo "</label>";  
-		break;
-		case 'select':
-			echo "<select id='$id' name='" . $option_name . "[$id]'>";
-			foreach($vals as $v=>$l){
-				$selected = ($o[$id] == $v) ? "selected='selected'" : '';  
-				echo "<option value='$v' $selected>$l</option>";
-			}
-			echo ($desc != '') ? $desc : "";
-			echo "</select>";  
-		break;
-		case 'radio':
-			echo "<fieldset>";
-			foreach($vals as $v=>$l){
-				$checked = ($o[$id] == $v) ? "checked='checked'" : '';  
-				echo "<label><input type='radio' name='" . $option_name . "[$id]' value='$v' $checked />$l</label><br />";
-			}
-			echo "</fieldset>";  
-		break; 
-	}
-}
- 
-
-function true_validate_settings($input) {
-	foreach($input as $k => $v) {
-		$valid_input[$k] = trim($v);
- 
-	}
-	return $valid_input;
+ 	echo '<h3>Shortcode: [display_calendar]</h3>';
 }
 
 /**

@@ -1,0 +1,16 @@
+.event-body{
+	text-align: center;
+}
+.event-body img{
+	max-width: 300px;
+}
+.title-event{
+	text-align: center;
+}
+#calendar h2{
+	clear: none;
+	padding: 0;
+}
+#calendar table{
+	margin: 0;
+}
